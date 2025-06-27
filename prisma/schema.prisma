@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  role          UserRole
+  username      String
+  kakao_uid     String          @unique
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+  ClassroomUser ClassroomUser[]
+
+  @@map("user")
+}
+
+model Classroom {
+  id          String          @id @default(cuid())
+  name        String
+  description String?
+  created_at  DateTime        @default(now())
+  updated_at  DateTime        @updatedAt
+  Users       ClassroomUser[]
+  Units       ClassroomUnit[]
+
+  @@map("classroom")
+}
+
+model ClassroomUser {
+  id         String    @id @default(cuid())
+  user       String
+  User       User      @relation(fields: [user], references: [id])
+  classroom  String
+  Classroom  Classroom @relation(fields: [classroom], references: [id])
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  @@map("classroom_user")
+}
+
+model ClassroomUnit {
+  id          String             @id @default(cuid())
+  classroom   String
+  Classroom   Classroom          @relation(fields: [classroom], references: [id])
+  title       String
+  description String?
+  created_at  DateTime           @default(now())
+  updated_at  DateTime           @updatedAt
+  Subunits    ClassroomSubunit[]
+
+  @@map("classroom_unit")
+}
+
+model ClassroomSubunit {
+  id            String             @id @default(cuid())
+  unit_id       String
+  ClassroomUnit ClassroomUnit      @relation(fields: [unit_id], references: [id])
+  title         String
+  code          String
+  description   String?
+  created_at    DateTime           @default(now())
+  updated_at    DateTime           @updatedAt
+  Contents      ClassroomContent[]
+
+  @@map("classroom_subunit")
+}
+
+model ClassroomContent {
+  id               String           @id @default(cuid())
+  subunit_id       String
+  ClassroomSubunit ClassroomSubunit @relation(fields: [subunit_id], references: [id])
+  label            String
+  type             String
+  body             String
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+
+  @@map("classroom_content")
+}
+
+enum UserRole {
+  student
+  teacher
+}
