@@ -1,5 +1,5 @@
 import type { ServiceSchema } from '@/services';
-import * as controllers from './controller';
+import * as controller from './controller';
 import Joi from 'joi';
 
 export default <ServiceSchema>{
@@ -15,9 +15,22 @@ export default <ServiceSchema>{
         kakaoUid: Joi.string().required(),
         username: Joi.string().required(),
       },
-      handler: controllers.signIn,
+      handler: controller.signIn,
       response: {
         "200": {
+          access_token: Joi.string(),
+          refresh_token: Joi.string(),
+        },
+      },
+    },
+    {
+      path: '/refresh',
+      method: 'get',
+      needAuth: true,
+      handler: controller.refresh,
+      description: '리프레시 토큰으로 새로운 토큰을 재발급합니다.',
+      response: {
+        '200': {
           access_token: Joi.string(),
           refresh_token: Joi.string(),
         },

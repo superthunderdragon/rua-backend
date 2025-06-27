@@ -9,6 +9,8 @@ import { errorHandler } from './middlewares';
 import { routers, serviceRouter, ServiceSchema } from './services';
 import { OpenAPIV3 } from 'openapi-types';
 import Joi from 'joi';
+import { prisma } from './resources';
+import config from './config';
 
 class App {
   public app: express.Application;
@@ -18,6 +20,7 @@ class App {
     this.initializeMiddlewares();
     this.initializeRouter();
     this.initializeErrorHandlers();
+    this.createDemo();
   }
 
   private initializeRouter() {
@@ -53,6 +56,20 @@ class App {
     this.app.use(errorHandler);
   }
 
+  private async createDemo() {
+    const classroom = await prisma.classroom.findFirst({
+      where: {
+        name: config.demoClassroom,
+      },
+    });
+    if (!classroom)
+      await prisma.classroom.create({
+        data: {
+          name: config.demoClassroom,
+        },
+      });
+  }
+
   private convertRoutesToSwagger(
     services: ServiceSchema[]
   ): OpenAPIV3.PathsObject {
@@ -60,9 +77,20 @@ class App {
 
     for (const service of services) {
       for (const route of service.routes) {
-        const fullPath = service.baseURL + route.path;
+        const fullPath = (service.baseURL + route.path).replace(
+          /:([a-zA-Z0-9_]+)/g,
+          '{$1}'
+        );
 
-        const parameters: OpenAPIV3.ParameterObject[] = [];
+        const paramMatches = [...route.path.matchAll(/:([a-zA-Z0-9_]+)/g)];
+        const parameters: OpenAPIV3.ParameterObject[] = paramMatches.map(
+          (match) => ({
+            name: match[1],
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+          })
+        );
 
         const requestBody: OpenAPIV3.RequestBodyObject | undefined =
           route.validateSchema
@@ -120,6 +148,7 @@ class App {
             security: route.needAuth ? [{ bearerAuth: [] }] : [],
             requestBody,
             responses,
+            parameters,
           },
         };
       }
@@ -140,9 +169,27 @@ class App {
       case 'boolean':
         return { type: 'boolean' };
       case 'array':
-        return { type: 'array', items: { type: 'string' } };
+        const items = joiSchema['$_terms'].items[0];
+        return {
+          type: 'array',
+          items: items
+            ? this.joiSchemaToOpenAPISchema(items)
+            : { type: 'string' },
+        };
       case 'object':
-        return { type: 'object' };
+        const keys = joiSchema['$_terms']?.keys || [];
+        return {
+          type: 'object',
+          properties: Object.fromEntries(
+            keys.map((key: any) => [
+              key.key,
+              this.joiSchemaToOpenAPISchema(key.schema),
+            ])
+          ),
+          required: keys
+            .filter((key: any) => key.schema._flags?.presence === 'required')
+            .map((key: any) => key.key),
+        };
       default:
         return { type: 'string' };
     }

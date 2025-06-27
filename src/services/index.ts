@@ -14,8 +14,9 @@ import { validator, attachUserInfo } from '@/middlewares';
 
 import authRouter from './auth';
 import userRouter from './user';
+import classroomRouter from './classroom';
 
-export const routers = [authRouter, userRouter];
+export const routers = [authRouter, userRouter, classroomRouter];
 
 interface KeyValue<T> {
   [key: string]: T;
@@ -29,7 +30,7 @@ export interface Route {
   handler: RequestHandler;
   validateSchema?: KeyValue<Joi.Schema>;
   needAuth: boolean;
-  onlyAdmin?: boolean;
+  onlyTeacher?: boolean;
   response: {
     [key: string]: any;
   };

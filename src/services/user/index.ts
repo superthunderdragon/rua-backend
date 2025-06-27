@@ -21,18 +21,5 @@ export default <ServiceSchema>{
         },
       },
     },
-    {
-      path: '/refresh',
-      method: 'get',
-      needAuth: true,
-      handler: controller.refresh,
-      description: '리프레시 토큰으로 새로운 토큰을 재발급합니다.',
-      response: {
-        '200': {
-          access_token: Joi.string(),
-          refresh_token: Joi.string(),
-        },
-      },
-    },
   ],
 };
