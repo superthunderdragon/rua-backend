@@ -3,9 +3,9 @@ import { NextFunction, Request, Response } from 'express';
 import { prisma, verify as verifyToken } from '@/resources';
 import { Route, services } from '@/services';
 
-type ServiceName = typeof services[number];
+type ServiceName = (typeof services)[number];
 export default (service: ServiceName | undefined, route: Route) =>
-  async (req: Request, Res: Response, next: NextFunction) => {
+  (req: Request, Res: Response, next: NextFunction) => {
     try {
       if (!route.needAuth) {
         return next();
@@ -20,7 +20,7 @@ export default (service: ServiceName | undefined, route: Route) =>
 
       const { token } = req;
 
-      const identity = await verifyToken(token);
+      const identity = verifyToken(token, route.path === '/refresh');
 
       if (!identity) {
         throw new HttpException(400, '잘못된 Token입니다.');

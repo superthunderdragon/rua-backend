@@ -13,8 +13,9 @@ import { HTTPMethod } from '@/types';
 import { validator, attachUserInfo } from '@/middlewares';
 
 import authRouter from './auth';
+import userRouter from './user';
 
-export const routers = [authRouter];
+export const routers = [authRouter, userRouter];
 
 interface KeyValue<T> {
   [key: string]: T;

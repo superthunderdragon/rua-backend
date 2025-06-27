@@ -16,3 +16,16 @@
 2025-06-28 05:03:29 info: Server listening on port 3000
 2025-06-28 05:03:50 info: Server listening on port 3000
 2025-06-28 05:04:13 info: Server listening on port 3000
+2025-06-28 05:05:28 info: Server listening on port 3000
+2025-06-28 05:09:35 info: Server listening on port 3000
+2025-06-28 05:10:00 info: Server listening on port 3000
+2025-06-28 05:10:18 info: Server listening on port 3000
+2025-06-28 05:10:27 info: Server listening on port 3000
+2025-06-28 05:10:58 info: Server listening on port 3000
+2025-06-28 05:13:53 info: Server listening on port 3000
+2025-06-28 05:14:42 info: Server listening on port 3000
+2025-06-28 05:15:48 info: Server listening on port 3000
+2025-06-28 05:17:58 error: [HttpException]액세스 토큰이 Authorization 헤더에 Bearer Token Type으로 전송되어야 합니다.
+2025-06-28 05:18:33 info: Server listening on port 3000
+2025-06-28 05:18:39 error: [HttpException]토큰이 변조되었습니다.
+2025-06-28 05:20:06 info: Server listening on port 3000
