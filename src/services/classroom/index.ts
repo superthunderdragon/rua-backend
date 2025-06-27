@@ -55,5 +55,56 @@ export default <ServiceSchema>{
         },
       },
     },
+    {
+      path: '/unit/:unitId/subunit',
+      method: 'get',
+      needAuth: true,
+      description: '중단원에 포함된 소단원들을 가져옵니디.',
+      handler: controller.getSubunits,
+      response: {
+        '200': {
+          subunits: Joi.array().items(
+            Joi.object({
+              id: Joi.string(),
+              description: Joi.string(),
+              title: Joi.string(),
+              code: Joi.string(),
+              unit_id: Joi.string(),
+              created_at: Joi.string(),
+              updated_at: Joi.string(),
+            })
+          ),
+        },
+      },
+    },
+    {
+      path: '/subunit/:subunitId',
+      method: 'get',
+      needAuth: true,
+      description: '소단원의 정보를 컨텐츠들의 정보와 함께 가져옵니다.',
+      handler: controller.getSubunit,
+      response: {
+        '200': {
+          id: Joi.string(),
+          code: Joi.string(),
+          description: Joi.string(),
+          title: Joi.string(),
+          unit_id: Joi.string(),
+          created_at: Joi.string(),
+          updated_at: Joi.string(),
+          Contents: Joi.array().items(
+            Joi.object({
+              id: Joi.string(),
+              created_at: Joi.string(),
+              updated_at: Joi.string(),
+              type: Joi.string(),
+              subunit_id: Joi.string(),
+              label: Joi.string(),
+              body: Joi.string(),
+            })
+          ),
+        },
+      },
+    },
   ],
 };
