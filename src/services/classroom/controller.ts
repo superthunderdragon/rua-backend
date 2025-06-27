@@ -70,3 +70,27 @@ export const getSubunit = async (req: Request, res: Response) => {
     ...subunit,
   });
 };
+
+export const getContents = async (req: Request, res: Response) => {
+  const { subunitId } = req.params;
+  const contents = await prisma.classroomContent.findMany({
+    where: {
+      ClassroomSubunit: {
+        id: subunitId,
+      },
+    },
+  });
+  res.json({ contents });
+};
+
+export const getContent = async (req: Request, res: Response) => {
+  const { contentId } = req.params;
+  const content = await prisma.classroomContent.findFirst({
+    where: { id: contentId },
+  });
+  if (!content) throw new HttpException(404, '컨텐츠를 찾을 수 없습니다.');
+
+  res.json({
+    ...content,
+  });
+};

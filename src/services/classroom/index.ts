@@ -106,5 +106,45 @@ export default <ServiceSchema>{
         },
       },
     },
+    {
+      path: '/subunit/:subunitId/content',
+      method: 'get',
+      needAuth: true,
+      description: '소단원에 포함된 컨텐츠들을 가져옵니다.',
+      handler: controller.getContents,
+      response: {
+        '200': {
+          contents: Joi.array().items(
+            Joi.object({
+              id: Joi.string(),
+              created_at: Joi.string(),
+              updated_at: Joi.string(),
+              type: Joi.string(),
+              subunit_id: Joi.string(),
+              label: Joi.string(),
+              body: Joi.string(),
+            })
+          ),
+        },
+      },
+    },
+    {
+      path: '/content/:contentId',
+      method: 'get',
+      needAuth: true,
+      description: '컨텐츠의 정보를 가져옵니다.',
+      handler: controller.getContent,
+      response: {
+        '200': {
+          id: Joi.string(),
+          created_at: Joi.string(),
+          updated_at: Joi.string(),
+          type: Joi.string(),
+          subunit_id: Joi.string(),
+          label: Joi.string(),
+          body: Joi.string(),
+        },
+      },
+    },
   ],
 };
