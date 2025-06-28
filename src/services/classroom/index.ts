@@ -84,6 +84,27 @@ export default <ServiceSchema>{
       },
     },
     {
+      path: '/unit/:unitId/subunit',
+      method: 'post',
+      needAuth: true,
+      onlyTeacher: true,
+      validateSchema: {
+        title: Joi.string().required(),
+        description: Joi.string().required(),
+        code: Joi.string().required(),
+      },
+      handler: controller.createSubunit,
+      response: {
+        '200': {
+          code: Joi.string(),
+          description: Joi.string(),
+          id: Joi.string(),
+          title: Joi.string(),
+          unitId: Joi.string(),
+        },
+      },
+    },
+    {
       path: '/subunit/:subunitId',
       method: 'get',
       needAuth: true,

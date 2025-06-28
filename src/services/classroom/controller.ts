@@ -34,9 +34,31 @@ export const getUnit = async (req: Request, res: Response) => {
   });
   if (!unit) throw new HttpException(404, '중단원을 찾을 수 없습니다.');
 
-  res.json({
-    ...unit,
+  res.json(unit);
+};
+
+export const createUnit = async (req: Request, res: Response) => {
+  const { title, description } = req.body;
+  const classroom = await prisma.classroom.findFirst({
+    where: { name: config.demoClassroom },
+    select: {
+      id: true,
+    },
   });
+  const unit = await prisma.classroomUnit.create({
+    data: {
+      title,
+      classroom: classroom.id,
+      description,
+    },
+    select: {
+      classroom: true,
+      description: true,
+      id: true,
+      title: true,
+    },
+  });
+  res.json(unit);
 };
 
 export const getSubunits = async (req: Request, res: Response) => {
@@ -75,9 +97,28 @@ export const getSubunit = async (req: Request, res: Response) => {
   });
   if (!subunit) throw new HttpException(404, '소단원을 찾을 수 없습니다.');
 
-  res.json({
-    ...subunit,
+  res.json(subunit);
+};
+
+export const createSubunit = async (req: Request, res: Response) => {
+  const { unitId } = req.params;
+  const { title, description, code } = req.body;
+  const subunit = await prisma.classroomSubunit.create({
+    data: {
+      code,
+      title,
+      description,
+      unitId,
+    },
+    select: {
+      code: true,
+      description: true,
+      id: true,
+      title: true,
+      unitId: true,
+    },
   });
+  res.json(subunit);
 };
 
 export const getContents = async (req: Request, res: Response) => {
@@ -113,31 +154,5 @@ export const getContent = async (req: Request, res: Response) => {
   });
   if (!content) throw new HttpException(404, '컨텐츠를 찾을 수 없습니다.');
 
-  res.json({
-    ...content,
-  });
-};
-
-export const createUnit = async (req: Request, res: Response) => {
-  const { title, description } = req.body;
-  const classroom = await prisma.classroom.findFirst({
-    where: { name: config.demoClassroom },
-    select: {
-      id: true,
-    },
-  });
-  const unit = await prisma.classroomUnit.create({
-    data: {
-      title,
-      classroom: classroom.id,
-      description,
-    },
-    select: {
-      classroom: true,
-      description: true,
-      id: true,
-      title: true,
-    },
-  });
-  res.json(unit);
+  res.json(content);
 };
