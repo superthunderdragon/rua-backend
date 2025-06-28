@@ -23,9 +23,12 @@ export default <ServiceSchema>{
       description: 'Metric을 생성합니다.',
       validateSchema: {
         metric: Joi.string().valid('study_time').required(),
-        value: Joi.valid(
-          Joi.object({
+        value: Joi.alternatives().try(
+          Joi.object().keys({
             timeMinute: Joi.number(),
+          }),
+          Joi.object().keys({
+            score: Joi.number(),
           })
         ),
       },
