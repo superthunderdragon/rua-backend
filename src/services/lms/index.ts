@@ -22,7 +22,7 @@ export default <ServiceSchema>{
       handler: controller.createMetric,
       description: 'Metric을 생성합니다.',
       validateSchema: {
-        metric: Joi.string().valid('study_time').required(),
+        metric: Joi.string().valid('studyTime').required(),
         value: Joi.alternatives().try(
           Joi.object().keys({
             timeMinute: Joi.number(),
