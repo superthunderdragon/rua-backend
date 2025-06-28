@@ -1,5 +1,5 @@
-import { prisma } from '@/resources';
-import type { Prisma } from '@/prisma';
+import { dayjs, prisma, toLocalDatetimeString } from '@/resources';
+import type { Metric, Prisma } from '@/prisma';
 import type { Request, Response } from 'express';
 import { HttpException } from '@/exceptions';
 import { addDays, format } from 'date-fns';
@@ -27,45 +27,37 @@ export const createMetric = async (req: Request, res: Response) => {
  * @async
  * @param req - Express의 Request 객체로, 쿼리 파라미터(startTime, endTime, metric, groupBy, aggregationFunc)와 인증 정보를 포함합니다.
  * @param res - Express의 Response 객체로, 결과를 JSON 형태로 반환합니다.
- * 
+ *
  * 사용자의 메트릭 데이터를 조회하는 컨트롤러 함수입니다.
- * 
+ *
  * - groupBy와 aggregationFunc가 없는 경우, 단순히 조건에 맞는 메트릭 리스트를 반환합니다.
- * - groupBy와 aggregationFunc가 모두 제공된 경우, 주어진 기간 내에서 지정된 단위(시간, 일, 주, 월, 년)로 데이터를 그룹화하고, 
+ * - groupBy와 aggregationFunc가 모두 제공된 경우, 주어진 기간 내에서 지정된 단위(시간, 일, 주, 월, 년)로 데이터를 그룹화하고,
  *   지정된 집계 함수(합계, 평균, 마지막 값, 첫 값, 최소, 최대, 개수)를 적용하여 결과를 반환합니다.
- * 
+ *
  * 지원하는 groupBy 값: 'hour', 'day', 'week', 'month', 'year'
  * 지원하는 aggregationFunc 값: 'sum', 'avg', 'last', 'first', 'min', 'max', 'count'
- * 
+ *
  * startTime과 endTime이 모두 제공되어야 하며, metric에 따라 집계에 사용할 value의 키가 달라집니다.
- * 
+ *
  * @throws {HttpException} 잘못된 파라미터나 지원하지 않는 값이 입력된 경우 400 에러를 발생시킵니다.
- * 
+ *
  * @returns {void} 결과는 res.json({ metrics }) 형태로 반환됩니다.
  */
-export const getMetrics = async (req: Request, res: Response) => {
-  const { startTime, endTime, metric, groupBy, aggregationFunc } = req.query;
-  if (!groupBy && !aggregationFunc) {
-    const metrics = await prisma.lmsMetric.findMany({
-      where: {
-        userId: req.auth.id,
-        metric: metric as Prisma.EnumMetricFilter<'LmsMetric'>,
-        ...(startTime && {
-          createdAt: { gte: new Date(startTime as string) },
-        }),
-        ...(endTime && { createdAt: { lte: new Date(endTime as string) } }),
-      },
-      select: {
-        id: true,
-        metric: true,
-        userId: true,
-        value: true,
-      },
-      orderBy: { createdAt: 'asc' },
-    });
-    return res.json({ metrics });
-  }
-
+const getMetrics = async ({
+  startTime,
+  endTime,
+  metric,
+  groupBy,
+  aggregationFunc,
+  userId,
+}: {
+  startTime: string;
+  endTime: string;
+  metric: Metric;
+  groupBy: 'hour' | 'day' | 'week' | 'month' | 'year';
+  aggregationFunc: 'sum' | 'avg' | 'last' | 'first' | 'min' | 'max';
+  userId: string;
+}) => {
   if (!groupBy || !aggregationFunc)
     throw new HttpException(
       400,
@@ -89,7 +81,7 @@ export const getMetrics = async (req: Request, res: Response) => {
 
   const metrics = await prisma.lmsMetric.findMany({
     where: {
-      userId: req.auth.id,
+      userId,
       metric: metric as Prisma.EnumMetricFilter<'LmsMetric'>,
       createdAt: {
         gte: start,
@@ -209,5 +201,31 @@ export const getMetrics = async (req: Request, res: Response) => {
     };
   });
 
-  res.json({ metrics: result });
+  return result;
+};
+
+export const getAttendance = async (req: Request, res: Response) => {
+  const { startTime } = req.query;
+
+  const result = await getMetrics({
+    aggregationFunc: 'last',
+    startTime: toLocalDatetimeString(
+      dayjs(startTime as string)
+        .day(0)
+        .startOf('day')
+        .toDate()
+    ),
+    endTime: toLocalDatetimeString(
+      dayjs(startTime as string)
+        .day(6)
+        .endOf('day')
+        .toDate()
+    ),
+    groupBy: 'day',
+    metric: 'studyTime',
+    userId: req.auth.id,
+  });
+  res.json({
+    result: result.filter((r) => !!r.value).map((r) => r.group),
+  });
 };

@@ -35,25 +35,14 @@ export default <ServiceSchema>{
       },
     },
     {
-      path: '/metric',
+      path: '/attendance',
       method: 'get',
       needAuth: true,
-      handler: controller.getMetrics,
+      handler: controller.getAttendance,
       description: '',
       response: {
         '200': {
-          metrics: Joi.array().valid(
-            Joi.object({
-              group: Joi.string(),
-              value: Joi.number(),
-            }),
-            Joi.object({
-              value: Joi.object(),
-              metric: Joi.string(),
-              id: Joi.string(),
-              userId: Joi.string(),
-            })
-          ),
+          result: Joi.number(),
         },
       },
     },
