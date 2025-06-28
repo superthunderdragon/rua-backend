@@ -34,7 +34,7 @@ export const issue = (identity: User, refresh?: boolean) => {
     refresh ? config.jwtRefreshSecret : config.jwtSecret,
     {
       algorithm: 'HS512',
-      expiresIn: refresh ? '1y' : '10m',
+      expiresIn: refresh ? '1y' : '12h',
     }
   );
   return token;
