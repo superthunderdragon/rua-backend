@@ -62,6 +62,15 @@ const wrapper =
     }
   };
 
+/**
+ * 여러 서비스의 라우트를 통합하여 Express Router 인스턴스를 생성합니다.
+ *
+ * 각 서비스는 baseURL, code, routes 등의 정보를 포함하며,
+ * 각 route에 대해 HTTP 메서드, 경로, 미들웨어, 스키마 검증, 핸들러를 등록합니다.
+ * 
+ * @param services 라우트와 관련 정보를 담고 있는 Service 객체 배열
+ * @returns 통합된 라우트가 등록된 Express Router 인스턴스
+ */
 const createService = (services: Service[]) => {
   const router = Router();
 
