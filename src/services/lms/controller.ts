@@ -90,14 +90,9 @@ const getMetrics = async ({
     },
     orderBy: { createdAt: 'asc' },
   });
-  function toKST(date: Date): Date {
-    return dayjs(date).add(9, 'hour').toDate();
-  }
-
   const grouped: Record<string, typeof metrics> = {};
   for (const m of metrics) {
-    const kstDate = toKST(m.createdAt);
-    const key = getGroupKey(kstDate, groupBy as string);
+    const key = getGroupKey(m.createdAt, groupBy as string);
     if (!grouped[key]) grouped[key] = [];
     grouped[key].push(m);
   }
