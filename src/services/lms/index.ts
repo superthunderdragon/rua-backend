@@ -20,13 +20,18 @@ export default <ServiceSchema>{
       handler: controller.createMetric,
       description: 'Metric을 생성합니다.',
       validateSchema: {
-        metric: Joi.string().valid('studyTime').required(),
+        metric: Joi.string()
+          .valid('studyTime', 'correct', 'progress')
+          .required(),
         value: Joi.alternatives().try(
           Joi.object({
             timeMinute: Joi.number(),
           }),
           Joi.object({
             score: Joi.number(),
+          }),
+          Joi.object({
+            progress: Joi.string(),
           })
         ),
       },
@@ -39,7 +44,7 @@ export default <ServiceSchema>{
       method: 'get',
       needAuth: true,
       handler: controller.getAttendance,
-      description: '',
+      description: '출석 현황을 가져옵니다.',
       response: {
         '200': {
           result: Joi.number(),
@@ -51,7 +56,19 @@ export default <ServiceSchema>{
       method: 'get',
       needAuth: true,
       handler: controller.getStudyTime,
-      description: '',
+      description: '총 학습 시간을 가져옵니다.',
+      response: {
+        '200': {
+          result: Joi.number(),
+        },
+      },
+    },
+    {
+      path: '/progress',
+      method: 'get',
+      needAuth: true,
+      handler: controller.getProgress,
+      description: '학습 진행률을 가져옵니다.',
       response: {
         '200': {
           result: Joi.number(),

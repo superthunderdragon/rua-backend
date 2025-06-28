@@ -104,4 +104,6 @@ enum UserRole {
 
 enum Metric {
   studyTime
+  progress
+  correct
 }

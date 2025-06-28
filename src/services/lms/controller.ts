@@ -91,18 +91,20 @@ const getMetrics = async ({
     orderBy: { createdAt: 'asc' },
   });
 
-  function getValueKey(metric: string) {
+  function getValueKey(metric: Metric) {
     switch (metric) {
       case 'studyTime':
         return 'timeMinute';
-      case 'formative_evaluation_try':
+      case 'correct':
         return 'score';
+      case 'progress':
+        return 'progress';
       default:
         throw new HttpException(400, '지원하지 않는 metric입니다.');
     }
   }
 
-  const valueKey = getValueKey(metric as string);
+  const valueKey = getValueKey(metric);
 
   function getGroupKey(date: Date, unit: string) {
     switch (unit) {
@@ -240,4 +242,27 @@ export const getStudyTime = async (req: Request, res: Response) => {
     userId: req.auth.id,
   });
   res.json({ result: result[0].value ? result[0].value : 0 });
+};
+
+export const getProgress = async (req: Request, res: Response) => {
+  const subunits = await prisma.classroomSubunit.findMany({
+    select: {
+      id: true,
+    },
+  });
+  const metrics = await prisma.lmsMetric.findMany({
+    where: {
+      userId: req.auth.id,
+      metric: 'progress',
+    },
+  });
+  const subunitIds: Array<string> = [];
+  for (const metric of metrics) {
+    if (typeof metric.value !== 'string') continue;
+    const progressId = JSON.parse(metric.value).progress;
+    if (!subunitIds.includes(progressId)) subunitIds.push(progressId);
+  }
+  res.json({
+    result: Math.floor((subunitIds.length / subunits.length) * 100),
+  });
 };
