@@ -17,7 +17,7 @@ export default <ServiceSchema>{
           id: Joi.string(),
           username: Joi.string(),
           role: Joi.string(),
-          created_at: Joi.date(),
+          createdAt: Joi.date(),
         },
       },
     },

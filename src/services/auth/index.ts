@@ -3,8 +3,8 @@ import * as controller from './controller';
 import Joi from 'joi';
 
 const LoginDto = {
-  access_token: Joi.string(),
-  refresh_token: Joi.string(),
+  accessToken: Joi.string(),
+  refreshToken: Joi.string(),
 };
 
 export default <ServiceSchema>{

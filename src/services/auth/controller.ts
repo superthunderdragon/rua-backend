@@ -10,12 +10,12 @@ export const signIn = async (req: Request, res: Response) => {
   if (!['student', 'teacher'].includes(role))
     throw new HttpException(401, '권한이 잘못되었습니다.');
   const user = await prisma.user.findFirst({
-    where: { kakao_uid: kakaoUid },
+    where: { kakaoUid },
   });
   if (!user) {
     const createUser = await prisma.user.create({
       data: {
-        kakao_uid: kakaoUid,
+        kakaoUid,
         username,
         role: role as UserRole,
       },
@@ -34,14 +34,14 @@ export const signIn = async (req: Request, res: Response) => {
       });
 
     res.json({
-      access_token: issue(createUser),
-      refresh_token: issue(createUser, true),
+      accessToken: issue(createUser),
+      refreshToken: issue(createUser, true),
     });
     return;
   }
   res.json({
-    access_token: issue(user),
-    refresh_token: issue(user, true),
+    accessToken: issue(user),
+    refreshToken: issue(user, true),
   });
 };
 
@@ -51,7 +51,7 @@ export const refresh = async (req: Request, res: Response) => {
     where: { id },
   });
   res.json({
-    access_token: issue(user),
-    refresh_token: issue(user, true),
+    accessToken: issue(user),
+    refreshToken: issue(user, true),
   });
 };

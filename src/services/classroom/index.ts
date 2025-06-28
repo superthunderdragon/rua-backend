@@ -7,24 +7,24 @@ const UnitDto = {
   id: Joi.string(),
   description: Joi.string(),
   title: Joi.string(),
-  created_at: Joi.string(),
-  updated_at: Joi.string(),
+  createdAt: Joi.string(),
+  updatedAt: Joi.string(),
 };
 const SubunitDto = {
   id: Joi.string(),
   description: Joi.string(),
   title: Joi.string(),
   code: Joi.string(),
-  unit_id: Joi.string(),
-  created_at: Joi.string(),
-  updated_at: Joi.string(),
+  unitId: Joi.string(),
+  createdAt: Joi.string(),
+  updatedAt: Joi.string(),
 };
 const ContentDto = {
   id: Joi.string(),
-  created_at: Joi.string(),
-  updated_at: Joi.string(),
+  createdAt: Joi.string(),
+  updatedAt: Joi.string(),
   type: Joi.string(),
-  subunit_id: Joi.string(),
+  subunitId: Joi.string(),
   label: Joi.string(),
   body: Joi.string(),
 };
