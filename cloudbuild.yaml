@@ -4,8 +4,8 @@
 # _REGION, _REPOSITORY, _IMAGE_NAME 값만 바꾸면 됩니다.
 
 substitutions:
-  _REGION: us          # 예: asia, us, europe…
-  _REPOSITORY: rua     # Artifact Registry 저장소 이름
+  _REGION: us-central1          # 예: asia, us, europe…
+  _REPOSITORY: rua-backend     # Artifact Registry 저장소 이름
   _IMAGE_NAME: backend # 이미지 이름
 
 options:
