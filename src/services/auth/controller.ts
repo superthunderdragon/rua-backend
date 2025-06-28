@@ -34,14 +34,14 @@ export const signIn = async (req: Request, res: Response) => {
       });
 
     res.json({
-      access_token: issue(createUser),
-      refresh_token: issue(createUser, true),
+      accessToken: issue(createUser),
+      refreshToken: issue(createUser, true),
     });
     return;
   }
   res.json({
-    access_token: issue(user),
-    refresh_token: issue(user, true),
+    accessToken: issue(user),
+    refreshToken: issue(user, true),
   });
 };
 
@@ -51,7 +51,7 @@ export const refresh = async (req: Request, res: Response) => {
     where: { id },
   });
   res.json({
-    access_token: issue(user),
-    refresh_token: issue(user, true),
+    accessToken: issue(user),
+    refreshToken: issue(user, true),
   });
 };
