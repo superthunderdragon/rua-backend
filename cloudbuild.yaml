@@ -50,6 +50,21 @@ steps:
       - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA'
       - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:latest'
 
+  # 5) Cloud Deploy 릴리스 생성 → dev 배포
+  - id: Release
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - deploy
+      - releases
+      - create
+      - rel-${SHORT_SHA}                     # 릴리스 이름(커밋 짧은 SHA)
+      - --delivery-pipeline=rua-backend-gke-deploy-pipeline-1
+      - --region=asia-northeast1
+      - --annotations=commitId=${COMMIT_SHA}
+      - --images=backend=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA
+
+
 images:
   - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA'
   - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:latest'
