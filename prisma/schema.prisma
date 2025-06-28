@@ -89,8 +89,8 @@ model LmsMetric {
   id        String   @id @default(uuid())
   metric    Metric
   value     Json
-  user_id   String
-  User      User     @relation(fields: [user_id], references: [id])
+  userId    String
+  User      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -103,5 +103,5 @@ enum UserRole {
 }
 
 enum Metric {
-  study_time
+  studyTime
 }

@@ -7,7 +7,7 @@ export const createMetric = async (req: Request, res: Response) => {
     data: {
       metric,
       value,
-      user_id: req.auth.id,
+      userId: req.auth.id,
     },
   });
   res.json({ ...metricData });
@@ -19,11 +19,11 @@ export const getMetrics = async (req: Request, res: Response) => {
     // Raw metric data
     const metrics = await prisma.lmsMetric.findMany({
       where: {
-        user_id: req.auth.id,
+        userId: req.auth.id,
         ...(startTime && {
-          created_at: { gte: new Date(startTime as string) },
+          createdAt: { gte: new Date(startTime as string) },
         }),
-        ...(endTime && { created_at: { lte: new Date(endTime as string) } }),
+        ...(endTime && { createdAt: { lte: new Date(endTime as string) } }),
       },
       orderBy: { createdAt: 'asc' },
     });
