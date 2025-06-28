@@ -4,11 +4,11 @@ import Joi from 'joi';
 
 const MetricDto = {
   id: Joi.string(),
-  created_at: Joi.date(),
-  updated_at: Joi.date(),
+  createdAt: Joi.date(),
+  updatedAt: Joi.date(),
   metric: Joi.string(),
   value: Joi.object(),
-  user_id: Joi.string(),
+  userId: Joi.string(),
 };
 
 export default <ServiceSchema>{
@@ -24,10 +24,10 @@ export default <ServiceSchema>{
       validateSchema: {
         metric: Joi.string().valid('studyTime').required(),
         value: Joi.alternatives().try(
-          Joi.object().keys({
+          Joi.object({
             timeMinute: Joi.number(),
           }),
-          Joi.object().keys({
+          Joi.object({
             score: Joi.number(),
           })
         ),
@@ -43,7 +43,20 @@ export default <ServiceSchema>{
       handler: controller.getMetrics,
       description: '',
       response: {
-        '200': {},
+        '200': {
+          metrics: Joi.array().valid(
+            Joi.object({
+              group: Joi.string(),
+              value: Joi.number(),
+            }),
+            Joi.object({
+              value: Joi.object(),
+              metric: Joi.string(),
+              id: Joi.string(),
+              userId: Joi.string(),
+            })
+          ),
+        },
       },
     },
   ],

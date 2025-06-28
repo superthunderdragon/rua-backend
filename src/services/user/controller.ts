@@ -1,4 +1,4 @@
-import { issue, prisma } from '@/resources';
+import { prisma } from '@/resources';
 import type { Request, Response } from 'express';
 
 export const getUserInfo = async (req: Request, res: Response) => {
@@ -10,7 +10,6 @@ export const getUserInfo = async (req: Request, res: Response) => {
     select: {
       username: true,
       role: true,
-      createdAt: true,
       id: true,
     },
   });

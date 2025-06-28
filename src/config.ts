@@ -2,5 +2,5 @@ export default {
   port: process.env.port,
   jwtSecret: process.env.jwtSecret,
   jwtRefreshSecret: process.env.jwtRefreshSecret,
-  demoClassroom: 'US:CODE 교실'
+  demoClassroom: '의성미래교육지구 단촌초등학교'
 };

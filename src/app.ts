@@ -8,6 +8,7 @@ import swaggerUi from 'swagger-ui-express';
 import { errorHandler } from './middlewares';
 import { routers, serviceRouter, ServiceSchema } from './services';
 import { OpenAPIV3 } from 'openapi-types';
+import j2s from 'joi-to-swagger';
 import Joi from 'joi';
 import { prisma } from './resources';
 import config from './config';
@@ -160,39 +161,7 @@ class App {
   private joiSchemaToOpenAPISchema(
     joiSchema: Joi.Schema
   ): OpenAPIV3.SchemaObject {
-    const type = joiSchema.type;
-    switch (type) {
-      case 'string':
-        return { type: 'string' };
-      case 'number':
-        return { type: 'number' };
-      case 'boolean':
-        return { type: 'boolean' };
-      case 'array':
-        const items = joiSchema['$_terms'].items[0];
-        return {
-          type: 'array',
-          items: items
-            ? this.joiSchemaToOpenAPISchema(items)
-            : { type: 'string' },
-        };
-      case 'object':
-        const keys = joiSchema['$_terms']?.keys || [];
-        return {
-          type: 'object',
-          properties: Object.fromEntries(
-            keys.map((key: any) => [
-              key.key,
-              this.joiSchemaToOpenAPISchema(key.schema),
-            ])
-          ),
-          required: keys
-            .filter((key: any) => key.schema._flags?.presence === 'required')
-            .map((key: any) => key.key),
-        };
-      default:
-        return { type: 'string' };
-    }
+    return j2s(joiSchema).swagger;
   }
 }
 

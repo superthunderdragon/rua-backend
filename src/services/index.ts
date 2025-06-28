@@ -15,8 +15,9 @@ import { validator, attachUserInfo } from '@/middlewares';
 import authRouter from './auth';
 import userRouter from './user';
 import classroomRouter from './classroom';
+import lmsRouter from './lms';
 
-export const routers = [authRouter, userRouter, classroomRouter];
+export const routers = [authRouter, userRouter, classroomRouter, lmsRouter];
 
 interface KeyValue<T> {
   [key: string]: T;
