@@ -75,5 +75,17 @@ export default <ServiceSchema>{
         },
       },
     },
+    {
+      path: '/correct',
+      method: 'get',
+      needAuth: true,
+      handler: controller.getCorrect,
+      description: '정답률을 가져옵니다.',
+      response: {
+        '200': {
+          result: Joi.number(),
+        },
+      },
+    },
   ],
 };

@@ -85,22 +85,17 @@ const getMetrics = async ({
     throw new HttpException(400, 'startTime과 endTime을 모두 제공해야 합니다.');
   }
 
-  const metrics = (
-    await prisma.lmsMetric.findMany({
-      where: {
-        userId,
-        metric: metric as Prisma.EnumMetricFilter<'LmsMetric'>,
-        createdAt: {
-          gte: start,
-          lte: end,
-        },
+  const metrics = await prisma.lmsMetric.findMany({
+    where: {
+      userId,
+      metric: metric as Prisma.EnumMetricFilter<'LmsMetric'>,
+      createdAt: {
+        gte: start,
+        lte: end,
       },
-      orderBy: { createdAt: 'asc' },
-    })
-  ).map((m) => ({
-    ...m,
-    createdAt: dayjs(m.createdAt).tz('Asia/Seoul').toDate(),
-  }));
+    },
+    orderBy: { createdAt: 'asc' },
+  });
 
   function getValueKey(metric: Metric) {
     switch (metric) {
@@ -275,5 +270,30 @@ export const getProgress = async (req: Request, res: Response) => {
   }
   res.json({
     result: Math.floor((subunitIds.length / subunits.length) * 100),
+  });
+};
+
+export const getCorrect = async (req: Request, res: Response) => {
+  const result = await getMetrics({
+    aggregationFunc: 'sum',
+    startTime: toLocalDatetimeString(dayjs().startOf('year').toDate()),
+    endTime: toLocalDatetimeString(new Date()),
+    groupBy: 'year',
+    metric: 'correct',
+    userId: req.auth.id,
+  });
+  const tests = await prisma.lmsMetric.findMany({
+    where: {
+      userId: req.auth.id,
+      metric: 'correct',
+    },
+    select: {
+      id: true,
+    },
+  });
+  res.json({
+    result: Math.floor(
+      ((result[0].value ? result[0].value : 0) / tests.length) * 100
+    ),
   });
 };
