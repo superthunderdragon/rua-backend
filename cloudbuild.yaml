@@ -8,6 +8,9 @@ substitutions:
   _IMAGE_NAME: backend        # 이미지 이름
   _IMAGE_URI: "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}"
 
+options:
+  logging: CLOUD_LOGGING_ONLY 
+
 steps:
   # 1) (선택) 의존성 설치·테스트
   - id: 'Test'
