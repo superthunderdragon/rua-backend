@@ -1,47 +1,55 @@
 # cloudbuild.yaml
 # ────────────────────────────────────────────────────────────────
 # 커밋 → 이미지 빌드 → Artifact Registry 푸시
-# 필요에 따라 _REGION, _REPOSITORY, _IMAGE_NAME 값을 바꿔 주세요.
+# _REGION, _REPOSITORY, _IMAGE_NAME 값만 바꾸면 됩니다.
+
 substitutions:
-  _REGION: us               # 예: asia, us, europe…
-  _REPOSITORY: rua    # Artifact Registry 저장소 이름
-  _IMAGE_NAME: backend        # 이미지 이름
-  _IMAGE_URI: "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}"
+  _REGION: us          # 예: asia, us, europe…
+  _REPOSITORY: rua     # Artifact Registry 저장소 이름
+  _IMAGE_NAME: backend # 이미지 이름
 
 options:
-  logging: CLOUD_LOGGING_ONLY 
+  logging: CLOUD_LOGGING_ONLY
 
 steps:
   # 1) (선택) 의존성 설치·테스트
-  - id: 'Test'
-    name: 'node:18'
-    entrypoint: 'bash'
+  - id: Test
+    name: node:18
+    entrypoint: bash
     args:
       - -c
       - |
-        corepack enable        # pnpm 내장 활성화
+        corepack enable                         # pnpm 내장 활성화
         corepack prepare pnpm@latest --activate
         pnpm install --frozen-lockfile
-        pnpm test || true      # 테스트 없으면 통과 처리
+        pnpm test || true                       # 테스트 없으면 통과
 
   # 2) 이미지 빌드
-  - id: 'Build'
-    name: 'gcr.io/cloud-builders/docker'
+  - id: Build
+    name: gcr.io/cloud-builders/docker
     args:
       - build
-      - '-f' # 명시적 Dockerfile
+      - -f
       - Dockerfile
-      - '-t'
-      - '${_IMAGE_URI}:$COMMIT_SHA'
+      - -t
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA'
       - .
 
   # 3) 푸시 (SHA 태그)
-  - id: 'Push'
-    name: 'gcr.io/cloud-builders/docker'
-    args: ['push', '${_IMAGE_URI}:$COMMIT_SHA']
+  - id: Push
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA'
 
   # 4) latest 태그 부여·푸시
-  - id: 'Tag latest'
-    name: 'gcr.io/cloud-builders/docker'
-    args: ['tag', '${_IMAGE_URI}:$COMMIT_SHA', '${_IMAGE_URI}:latest']
+  - id: Tag latest
+    name: gcr.io/cloud-builders/docker
+    args:
+      - tag
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:latest'
 
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:latest'
