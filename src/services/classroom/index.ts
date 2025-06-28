@@ -2,6 +2,33 @@ import { ServiceSchema } from '@/services';
 import * as controller from './controller';
 import Joi from 'joi';
 
+const UnitDto = {
+  classroom: Joi.string(),
+  id: Joi.string(),
+  description: Joi.string(),
+  title: Joi.string(),
+  created_at: Joi.string(),
+  updated_at: Joi.string(),
+};
+const SubunitDto = {
+  id: Joi.string(),
+  description: Joi.string(),
+  title: Joi.string(),
+  code: Joi.string(),
+  unit_id: Joi.string(),
+  created_at: Joi.string(),
+  updated_at: Joi.string(),
+};
+const ContentDto = {
+  id: Joi.string(),
+  created_at: Joi.string(),
+  updated_at: Joi.string(),
+  type: Joi.string(),
+  subunit_id: Joi.string(),
+  label: Joi.string(),
+  body: Joi.string(),
+};
+
 export default <ServiceSchema>{
   baseURL: '/classroom',
   name: 'classroom',
@@ -14,16 +41,7 @@ export default <ServiceSchema>{
       handler: controller.getUnits,
       response: {
         '200': {
-          units: Joi.array().items(
-            Joi.object({
-              classroom: Joi.string(),
-              id: Joi.string(),
-              description: Joi.string(),
-              title: Joi.string(),
-              created_at: Joi.string(),
-              updated_at: Joi.string(),
-            })
-          ),
+          units: Joi.array().items(Joi.object(UnitDto)),
         },
       },
     },
@@ -35,23 +53,8 @@ export default <ServiceSchema>{
       handler: controller.getUnit,
       response: {
         '200': {
-          id: Joi.string(),
-          classroom: Joi.string(),
-          description: Joi.string(),
-          title: Joi.string(),
-          created_at: Joi.string(),
-          updated_at: Joi.string(),
-          Subunits: Joi.array().items(
-            Joi.object({
-              id: Joi.string(),
-              description: Joi.string(),
-              title: Joi.string(),
-              code: Joi.string(),
-              unit_id: Joi.string(),
-              created_at: Joi.string(),
-              updated_at: Joi.string(),
-            })
-          ),
+          ...UnitDto,
+          Subunits: Joi.array().items(Joi.object(SubunitDto)),
         },
       },
     },
@@ -63,17 +66,7 @@ export default <ServiceSchema>{
       handler: controller.getSubunits,
       response: {
         '200': {
-          subunits: Joi.array().items(
-            Joi.object({
-              id: Joi.string(),
-              description: Joi.string(),
-              title: Joi.string(),
-              code: Joi.string(),
-              unit_id: Joi.string(),
-              created_at: Joi.string(),
-              updated_at: Joi.string(),
-            })
-          ),
+          subunits: Joi.array().items(Joi.object(SubunitDto)),
         },
       },
     },
@@ -85,24 +78,8 @@ export default <ServiceSchema>{
       handler: controller.getSubunit,
       response: {
         '200': {
-          id: Joi.string(),
-          code: Joi.string(),
-          description: Joi.string(),
-          title: Joi.string(),
-          unit_id: Joi.string(),
-          created_at: Joi.string(),
-          updated_at: Joi.string(),
-          Contents: Joi.array().items(
-            Joi.object({
-              id: Joi.string(),
-              created_at: Joi.string(),
-              updated_at: Joi.string(),
-              type: Joi.string(),
-              subunit_id: Joi.string(),
-              label: Joi.string(),
-              body: Joi.string(),
-            })
-          ),
+          ...SubunitDto,
+          Contents: Joi.array().items(Joi.object(ContentDto)),
         },
       },
     },
@@ -114,17 +91,7 @@ export default <ServiceSchema>{
       handler: controller.getContents,
       response: {
         '200': {
-          contents: Joi.array().items(
-            Joi.object({
-              id: Joi.string(),
-              created_at: Joi.string(),
-              updated_at: Joi.string(),
-              type: Joi.string(),
-              subunit_id: Joi.string(),
-              label: Joi.string(),
-              body: Joi.string(),
-            })
-          ),
+          contents: Joi.array().items(Joi.object(ContentDto)),
         },
       },
     },
@@ -135,15 +102,7 @@ export default <ServiceSchema>{
       description: '컨텐츠의 정보를 가져옵니다.',
       handler: controller.getContent,
       response: {
-        '200': {
-          id: Joi.string(),
-          created_at: Joi.string(),
-          updated_at: Joi.string(),
-          type: Joi.string(),
-          subunit_id: Joi.string(),
-          label: Joi.string(),
-          body: Joi.string(),
-        },
+        '200': ContentDto,
       },
     },
   ],

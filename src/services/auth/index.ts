@@ -2,6 +2,11 @@ import type { ServiceSchema } from '@/services';
 import * as controller from './controller';
 import Joi from 'joi';
 
+const LoginDto = {
+  access_token: Joi.string(),
+  refresh_token: Joi.string(),
+};
+
 export default <ServiceSchema>{
   name: 'auth',
   baseURL: '/auth',
@@ -17,10 +22,7 @@ export default <ServiceSchema>{
       },
       handler: controller.signIn,
       response: {
-        "200": {
-          access_token: Joi.string(),
-          refresh_token: Joi.string(),
-        },
+        '200': LoginDto,
       },
     },
     {
@@ -30,10 +32,7 @@ export default <ServiceSchema>{
       handler: controller.refresh,
       description: '리프레시 토큰으로 새로운 토큰을 재발급합니다.',
       response: {
-        '200': {
-          access_token: Joi.string(),
-          refresh_token: Joi.string(),
-        },
+        '200': LoginDto,
       },
     },
   ],

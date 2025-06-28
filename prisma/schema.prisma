@@ -9,19 +9,20 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(cuid())
+  id            String          @id @default(uuid())
   role          UserRole
   username      String
   kakao_uid     String          @unique
   created_at    DateTime        @default(now())
   updated_at    DateTime        @updatedAt
   ClassroomUser ClassroomUser[]
+  LmsMetrics    LmsMetric[]
 
   @@map("user")
 }
 
 model Classroom {
-  id          String          @id @default(cuid())
+  id          String          @id @default(uuid())
   name        String
   description String?
   created_at  DateTime        @default(now())
@@ -33,7 +34,7 @@ model Classroom {
 }
 
 model ClassroomUser {
-  id         String    @id @default(cuid())
+  id         String    @id @default(uuid())
   user       String
   User       User      @relation(fields: [user], references: [id])
   classroom  String
@@ -45,7 +46,7 @@ model ClassroomUser {
 }
 
 model ClassroomUnit {
-  id          String             @id @default(cuid())
+  id          String             @id @default(uuid())
   classroom   String
   Classroom   Classroom          @relation(fields: [classroom], references: [id])
   title       String
@@ -58,7 +59,7 @@ model ClassroomUnit {
 }
 
 model ClassroomSubunit {
-  id            String             @id @default(cuid())
+  id            String             @id @default(uuid())
   unit_id       String
   ClassroomUnit ClassroomUnit      @relation(fields: [unit_id], references: [id])
   title         String
@@ -72,7 +73,7 @@ model ClassroomSubunit {
 }
 
 model ClassroomContent {
-  id               String           @id @default(cuid())
+  id               String           @id @default(uuid())
   subunit_id       String
   ClassroomSubunit ClassroomSubunit @relation(fields: [subunit_id], references: [id])
   label            String
@@ -84,7 +85,23 @@ model ClassroomContent {
   @@map("classroom_content")
 }
 
+model LmsMetric {
+  id         String   @id @default(uuid())
+  metric     Metric
+  value      Json
+  user_id    String
+  User       User     @relation(fields: [user_id], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("lms_metric")
+}
+
 enum UserRole {
   student
   teacher
+}
+
+enum Metric {
+  study_time
 }

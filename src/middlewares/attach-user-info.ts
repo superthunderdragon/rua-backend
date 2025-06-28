@@ -21,17 +21,17 @@ export default (service: ServiceName | undefined, route: Route) =>
 
       if (!identity) throw new HttpException(400, '잘못된 Token입니다.');
 
-      if (route.onlyTeacher) {
-        const user = await prisma.user.findFirst({
-          where: {
-            id: identity.id,
-          },
-          select: {
-            role: true,
-          },
-        });
-        if (user.role !== 'teacher') throw new HttpException(403, '권한이 부족합니다.');
-      }
+      const user = await prisma.user.findFirst({
+        where: {
+          id: identity.id,
+        },
+        select: {
+          role: true,
+        },
+      });
+      if (!user) throw new HttpException(404, '유저 정보를 찾을 수 없습니다.');
+      if (route.onlyTeacher && user.role !== 'teacher')
+        throw new HttpException(403, '권한이 부족합니다.');
 
       req.auth = {
         id: identity.id,

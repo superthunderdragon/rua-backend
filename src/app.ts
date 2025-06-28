@@ -30,7 +30,7 @@ class App {
       swaggerUi.serve,
       swaggerUi.setup({
         openapi: '3.0.0',
-        info: { title: 'LUA_API', version: '1.0.0' },
+        info: { title: 'RUA_API', version: '1.0.0' },
         paths: this.convertRoutesToSwagger(routers),
       })
     );
