@@ -4,6 +4,12 @@ import type { Request, Response } from 'express';
 import { HttpException } from '@/exceptions';
 import { addDays, format } from 'date-fns';
 
+import dayjsLib from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+dayjsLib.extend(utc);
+dayjsLib.extend(timezone);
+
 export const createMetric = async (req: Request, res: Response) => {
   const { metric, value } = req.body;
   const metricData = await prisma.lmsMetric.create({
@@ -79,17 +85,22 @@ const getMetrics = async ({
     throw new HttpException(400, 'startTime과 endTime을 모두 제공해야 합니다.');
   }
 
-  const metrics = await prisma.lmsMetric.findMany({
-    where: {
-      userId,
-      metric: metric as Prisma.EnumMetricFilter<'LmsMetric'>,
-      createdAt: {
-        gte: start,
-        lte: end,
+  const metrics = (
+    await prisma.lmsMetric.findMany({
+      where: {
+        userId,
+        metric: metric as Prisma.EnumMetricFilter<'LmsMetric'>,
+        createdAt: {
+          gte: start,
+          lte: end,
+        },
       },
-    },
-    orderBy: { createdAt: 'asc' },
-  });
+      orderBy: { createdAt: 'asc' },
+    })
+  ).map((m) => ({
+    ...m,
+    createdAt: dayjs(m.createdAt).tz('Asia/Seoul').toDate(),
+  }));
 
   function getValueKey(metric: Metric) {
     switch (metric) {
