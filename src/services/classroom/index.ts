@@ -130,6 +130,16 @@ export default <ServiceSchema>{
       },
     },
     {
+      path: '/subunit/:subunitId/content',
+      method: 'post',
+      needAuth: true,
+      onlyTeacher: true,
+      handler: controller.createContent,
+      response: {
+        '200': ContentDto,
+      },
+    },
+    {
       path: '/content/:contentId',
       method: 'get',
       needAuth: true,

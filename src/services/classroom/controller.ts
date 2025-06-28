@@ -92,7 +92,11 @@ export const getSubunit = async (req: Request, res: Response) => {
       id: true,
       title: true,
       unitId: true,
-      Contents: true,
+      Contents: {
+        orderBy: {
+          label: 'asc',
+        },
+      },
     },
   });
   if (!subunit) throw new HttpException(404, '소단원을 찾을 수 없습니다.');
@@ -129,6 +133,9 @@ export const getContents = async (req: Request, res: Response) => {
         id: subunitId,
       },
     },
+    orderBy: {
+      label: 'asc',
+    },
     select: {
       body: true,
       id: true,
@@ -154,5 +161,27 @@ export const getContent = async (req: Request, res: Response) => {
   });
   if (!content) throw new HttpException(404, '컨텐츠를 찾을 수 없습니다.');
 
+  res.json(content);
+};
+
+export const createContent = async (req: Request, res: Response) => {
+  const { subunitId } = req.params;
+  const { type, label, body } = req.body;
+
+  const content = await prisma.classroomContent.create({
+    data: {
+      body,
+      label,
+      type,
+      subunitId,
+    },
+    select: {
+      body: true,
+      id: true,
+      label: true,
+      subunitId: true,
+      type: true,
+    },
+  });
   res.json(content);
 };
