@@ -4,9 +4,11 @@
 # _REGION, _REPOSITORY, _IMAGE_NAME 값만 바꾸면 됩니다.
 
 substitutions:
-  _REGION: us-central1          # 예: asia, us, europe…
-  _REPOSITORY: rua-backend     # Artifact Registry 저장소 이름
-  _IMAGE_NAME: backend # 이미지 이름
+  _REGION: us               # Artifact Registry 멀티리전·리전 (예: asia, us, us-central1 …)
+  _AR_REPOSITORY: rua       # Artifact Registry 저장소 ID
+  _IMAGE_NAME: backend      # 이미지 이름
+  _RUN_SERVICE: backend # Cloud Run 서비스 이름 (없으면 첫 배포 때 자동 생성)
+  _RUN_REGION: us-central1  # Cloud Run 서비스(런타임) 리전
 
 options:
   logging: CLOUD_LOGGING_ONLY
@@ -50,19 +52,19 @@ steps:
       - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA'
       - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:latest'
 
-  # 5) Cloud Deploy 릴리스 생성 → dev 배포
-  - id: Release
+  # 5) Cloud Run 배포
+  - id: Deploy to Cloud Run
     name: gcr.io/google.com/cloudsdktool/cloud-sdk
     entrypoint: gcloud
     args:
+      - run
       - deploy
-      - releases
-      - create
-      - rel-${SHORT_SHA}                     # 릴리스 이름(커밋 짧은 SHA)
-      - --delivery-pipeline=rua-backend-gke-deploy-pipeline-1
-      - --region=asia-northeast1
-      - --annotations=commitId=${COMMIT_SHA}
-      - --images=backend=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA
+      - '${_RUN_SERVICE}'
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/${_IMAGE_NAME}:$COMMIT_SHA
+      - --region=${_RUN_REGION}
+      - --platform=managed
+      - --allow-unauthenticated   # 필요 시 삭제
+      - --quiet
 
 
 images:
