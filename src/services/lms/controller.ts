@@ -229,3 +229,15 @@ export const getAttendance = async (req: Request, res: Response) => {
     result: result.filter((r) => !!r.value).map((r) => r.group),
   });
 };
+
+export const getStudyTime = async (req: Request, res: Response) => {
+  const result = await getMetrics({
+    aggregationFunc: 'sum',
+    startTime: toLocalDatetimeString(dayjs().startOf('year').toDate()),
+    endTime: toLocalDatetimeString(new Date()),
+    groupBy: 'year',
+    metric: 'studyTime',
+    userId: req.auth.id,
+  });
+  res.json({ result: result[0].value ? result[0].value : 0 });
+};

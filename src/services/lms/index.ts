@@ -46,5 +46,17 @@ export default <ServiceSchema>{
         },
       },
     },
+    {
+      path: '/studyTime',
+      method: 'get',
+      needAuth: true,
+      handler: controller.getStudyTime,
+      description: '',
+      response: {
+        '200': {
+          result: Joi.number(),
+        },
+      },
+    },
   ],
 };
