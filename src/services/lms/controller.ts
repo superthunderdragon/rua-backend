@@ -72,13 +72,8 @@ const getMetrics = async ({
   if (!validAggFuncs.includes(aggregationFunc as string))
     throw new HttpException(400, 'aggregationFunc의 값이 올바르지 않습니다.');
 
-  const toUTC = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-  };
-
-  const start = startTime ? toUTC(startTime as string) : null;
-  const end = endTime ? toUTC(endTime as string) : null;
+  const start = startTime ? new Date(startTime as string) : null;
+  const end = endTime ? new Date(endTime as string) : null;
 
   if (!start || !end) {
     throw new HttpException(400, 'startTime과 endTime을 모두 제공해야 합니다.');
@@ -266,10 +261,7 @@ export const getProgress = async (req: Request, res: Response) => {
   });
   const subunitIds: Array<string> = [];
   for (const metric of metrics) {
-    console.log(metric.value);
-    console.log(typeof metric.value);
-    if (typeof metric.value !== 'string') continue;
-    const progressId = JSON.parse(metric.value).progress;
+    const progressId = (metric.value as { progress: string }).progress;
     if (!subunitIds.includes(progressId)) subunitIds.push(progressId);
   }
   res.json({
