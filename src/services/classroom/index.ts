@@ -7,8 +7,6 @@ const UnitDto = {
   id: Joi.string(),
   description: Joi.string(),
   title: Joi.string(),
-  createdAt: Joi.string(),
-  updatedAt: Joi.string(),
 };
 const SubunitDto = {
   id: Joi.string(),
@@ -16,13 +14,9 @@ const SubunitDto = {
   title: Joi.string(),
   code: Joi.string(),
   unitId: Joi.string(),
-  createdAt: Joi.string(),
-  updatedAt: Joi.string(),
 };
 const ContentDto = {
   id: Joi.string(),
-  createdAt: Joi.string(),
-  updatedAt: Joi.string(),
   type: Joi.string(),
   subunitId: Joi.string(),
   label: Joi.string(),
@@ -42,6 +36,25 @@ export default <ServiceSchema>{
       response: {
         '200': {
           units: Joi.array().items(Joi.object(UnitDto)),
+        },
+      },
+    },
+    {
+      path: '/unit',
+      method: 'post',
+      needAuth: true,
+      onlyTeacher: true,
+      handler: controller.createUnit,
+      validateSchema: {
+        title: Joi.string().required(),
+        description: Joi.string().required(),
+      },
+      response: {
+        '200': {
+          classroom: Joi.string(),
+          id: Joi.string(),
+          description: Joi.string(),
+          title: Joi.string(),
         },
       },
     },

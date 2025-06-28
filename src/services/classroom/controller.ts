@@ -10,6 +10,12 @@ export const getUnits = async (req: Request, res: Response) => {
         name: config.demoClassroom,
       },
     },
+    select: {
+      classroom: true,
+      description: true,
+      id: true,
+      title: true,
+    },
   });
   res.json({ units });
 };
@@ -21,10 +27,8 @@ export const getUnit = async (req: Request, res: Response) => {
     select: {
       id: true,
       classroom: true,
-      createdAt: true,
       description: true,
       title: true,
-      updatedAt: true,
       Subunits: true,
     },
   });
@@ -43,6 +47,13 @@ export const getSubunits = async (req: Request, res: Response) => {
         id: unitId,
       },
     },
+    select: {
+      code: true,
+      description: true,
+      id: true,
+      title: true,
+      unitId: true,
+    },
   });
   res.json({ subunits });
 };
@@ -55,12 +66,10 @@ export const getSubunit = async (req: Request, res: Response) => {
     },
     select: {
       code: true,
-      createdAt: true,
       description: true,
       id: true,
       title: true,
       unitId: true,
-      updatedAt: true,
       Contents: true,
     },
   });
@@ -79,6 +88,13 @@ export const getContents = async (req: Request, res: Response) => {
         id: subunitId,
       },
     },
+    select: {
+      body: true,
+      id: true,
+      label: true,
+      subunitId: true,
+      type: true,
+    },
   });
   res.json({ contents });
 };
@@ -87,10 +103,41 @@ export const getContent = async (req: Request, res: Response) => {
   const { contentId } = req.params;
   const content = await prisma.classroomContent.findFirst({
     where: { id: contentId },
+    select: {
+      body: true,
+      id: true,
+      label: true,
+      subunitId: true,
+      type: true,
+    },
   });
   if (!content) throw new HttpException(404, '컨텐츠를 찾을 수 없습니다.');
 
   res.json({
     ...content,
   });
+};
+
+export const createUnit = async (req: Request, res: Response) => {
+  const { title, description } = req.body;
+  const classroom = await prisma.classroom.findFirst({
+    where: { name: config.demoClassroom },
+    select: {
+      id: true,
+    },
+  });
+  const unit = await prisma.classroomUnit.create({
+    data: {
+      title,
+      classroom: classroom.id,
+      description,
+    },
+    select: {
+      classroom: true,
+      description: true,
+      id: true,
+      title: true,
+    },
+  });
+  res.json(unit);
 };

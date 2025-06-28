@@ -12,6 +12,12 @@ export const createMetric = async (req: Request, res: Response) => {
       value,
       userId: req.auth.id,
     },
+    select: {
+      id: true,
+      metric: true,
+      userId: true,
+      value: true,
+    },
   });
   res.json({ ...metricData });
 };
@@ -27,6 +33,12 @@ export const getMetrics = async (req: Request, res: Response) => {
           createdAt: { gte: new Date(startTime as string) },
         }),
         ...(endTime && { createdAt: { lte: new Date(endTime as string) } }),
+      },
+      select: {
+        id: true,
+        metric: true,
+        userId: true,
+        value: true,
       },
       orderBy: { createdAt: 'asc' },
     });

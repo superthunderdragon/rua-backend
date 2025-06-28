@@ -4,8 +4,6 @@ import Joi from 'joi';
 
 const MetricDto = {
   id: Joi.string(),
-  createdAt: Joi.date(),
-  updatedAt: Joi.date(),
   metric: Joi.string(),
   value: Joi.object(),
   userId: Joi.string(),
