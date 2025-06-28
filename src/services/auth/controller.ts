@@ -10,12 +10,12 @@ export const signIn = async (req: Request, res: Response) => {
   if (!['student', 'teacher'].includes(role))
     throw new HttpException(401, '권한이 잘못되었습니다.');
   const user = await prisma.user.findFirst({
-    where: { kakao_uid: kakaoUid },
+    where: { kakaoUid },
   });
   if (!user) {
     const createUser = await prisma.user.create({
       data: {
-        kakao_uid: kakaoUid,
+        kakaoUid,
         username,
         role: role as UserRole,
       },

@@ -34,6 +34,7 @@ export interface Route {
   response: {
     [key: string]: any;
   };
+  querySchema?: KeyValue<Joi.Schema>;
 }
 
 // 임포트 된 서비스 (서비스 디렉토리 명 추가)

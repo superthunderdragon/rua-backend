@@ -12,9 +12,9 @@ model User {
   id            String          @id @default(uuid())
   role          UserRole
   username      String
-  kakao_uid     String          @unique
-  created_at    DateTime        @default(now())
-  updated_at    DateTime        @updatedAt
+  kakaoUid      String          @unique
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
   ClassroomUser ClassroomUser[]
   LmsMetrics    LmsMetric[]
 
@@ -25,8 +25,8 @@ model Classroom {
   id          String          @id @default(uuid())
   name        String
   description String?
-  created_at  DateTime        @default(now())
-  updated_at  DateTime        @updatedAt
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   Users       ClassroomUser[]
   Units       ClassroomUnit[]
 
@@ -34,13 +34,13 @@ model Classroom {
 }
 
 model ClassroomUser {
-  id         String    @id @default(uuid())
-  user       String
-  User       User      @relation(fields: [user], references: [id])
-  classroom  String
-  Classroom  Classroom @relation(fields: [classroom], references: [id])
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
+  id        String    @id @default(uuid())
+  user      String
+  User      User      @relation(fields: [user], references: [id])
+  classroom String
+  Classroom Classroom @relation(fields: [classroom], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@map("classroom_user")
 }
@@ -51,8 +51,8 @@ model ClassroomUnit {
   Classroom   Classroom          @relation(fields: [classroom], references: [id])
   title       String
   description String?
-  created_at  DateTime           @default(now())
-  updated_at  DateTime           @updatedAt
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
   Subunits    ClassroomSubunit[]
 
   @@map("classroom_unit")
@@ -60,13 +60,13 @@ model ClassroomUnit {
 
 model ClassroomSubunit {
   id            String             @id @default(uuid())
-  unit_id       String
-  ClassroomUnit ClassroomUnit      @relation(fields: [unit_id], references: [id])
+  unitId        String
+  ClassroomUnit ClassroomUnit      @relation(fields: [unitId], references: [id])
   title         String
   code          String
   description   String?
-  created_at    DateTime           @default(now())
-  updated_at    DateTime           @updatedAt
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
   Contents      ClassroomContent[]
 
   @@map("classroom_subunit")
@@ -74,25 +74,25 @@ model ClassroomSubunit {
 
 model ClassroomContent {
   id               String           @id @default(uuid())
-  subunit_id       String
-  ClassroomSubunit ClassroomSubunit @relation(fields: [subunit_id], references: [id])
+  subunitId        String
+  ClassroomSubunit ClassroomSubunit @relation(fields: [subunitId], references: [id])
   label            String
   type             String
   body             String
-  created_at       DateTime         @default(now())
-  updated_at       DateTime         @updatedAt
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
   @@map("classroom_content")
 }
 
 model LmsMetric {
-  id         String   @id @default(uuid())
-  metric     Metric
-  value      Json
-  user_id    String
-  User       User     @relation(fields: [user_id], references: [id])
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id        String   @id @default(uuid())
+  metric    Metric
+  value     Json
+  user_id   String
+  User      User     @relation(fields: [user_id], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("lms_metric")
 }

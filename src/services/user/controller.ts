@@ -10,7 +10,7 @@ export const getUserInfo = async (req: Request, res: Response) => {
     select: {
       username: true,
       role: true,
-      created_at: true,
+      createdAt: true,
       id: true,
     },
   });

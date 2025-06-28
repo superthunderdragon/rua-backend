@@ -21,10 +21,10 @@ export const getUnit = async (req: Request, res: Response) => {
     select: {
       id: true,
       classroom: true,
-      created_at: true,
+      createdAt: true,
       description: true,
       title: true,
-      updated_at: true,
+      updatedAt: true,
       Subunits: true,
     },
   });
@@ -55,12 +55,12 @@ export const getSubunit = async (req: Request, res: Response) => {
     },
     select: {
       code: true,
-      created_at: true,
+      createdAt: true,
       description: true,
       id: true,
       title: true,
-      unit_id: true,
-      updated_at: true,
+      unitId: true,
+      updatedAt: true,
       Contents: true,
     },
   });
