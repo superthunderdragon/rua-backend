@@ -72,30 +72,40 @@ const getMetrics = async ({
   if (!validAggFuncs.includes(aggregationFunc as string))
     throw new HttpException(400, 'aggregationFunc의 값이 올바르지 않습니다.');
 
-  const start = startTime ? new Date(startTime as string) : null;
-  const end = endTime ? new Date(endTime as string) : null;
+  const toUTC = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  };
+
+  const start = startTime ? toUTC(startTime as string) : null;
+  const end = endTime ? toUTC(endTime as string) : null;
 
   if (!start || !end) {
     throw new HttpException(400, 'startTime과 endTime을 모두 제공해야 합니다.');
   }
 
-  const metrics = (
-    await prisma.lmsMetric.findMany({
-      where: {
-        userId,
-        metric: metric as Prisma.EnumMetricFilter<'LmsMetric'>,
-        createdAt: {
-          gte: start,
-          lte: end,
-        },
+  const metrics = await prisma.lmsMetric.findMany({
+    where: {
+      userId,
+      metric: metric as Prisma.EnumMetricFilter<'LmsMetric'>,
+      createdAt: {
+        gte: start,
+        lte: end,
       },
-      orderBy: { createdAt: 'asc' },
-    })
-  ).map((m) => ({
-    ...m,
-    createdAt: dayjs(m.createdAt).add(9, 'hour').toDate(),
-  }));
+    },
+    orderBy: { createdAt: 'asc' },
+  });
+  function toKST(date: Date): Date {
+    return dayjs(date).add(9, 'hour').toDate();
+  }
 
+  const grouped: Record<string, typeof metrics> = {};
+  for (const m of metrics) {
+    const kstDate = toKST(m.createdAt);
+    const key = getGroupKey(kstDate, groupBy as string);
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(m);
+  }
   function getValueKey(metric: Metric) {
     switch (metric) {
       case 'studyTime':
@@ -126,13 +136,6 @@ const getMetrics = async ({
       default:
         throw new HttpException(400, 'groupBy의 값이 유효하지 않습니다.');
     }
-  }
-
-  const grouped: Record<string, typeof metrics> = {};
-  for (const m of metrics) {
-    const key = getGroupKey(m.createdAt, groupBy as string);
-    if (!grouped[key]) grouped[key] = [];
-    grouped[key].push(m);
   }
 
   function generateGroupKeys(start: Date, end: Date, unit: string): string[] {
@@ -263,6 +266,8 @@ export const getProgress = async (req: Request, res: Response) => {
   });
   const subunitIds: Array<string> = [];
   for (const metric of metrics) {
+    console.log(metric.value);
+    console.log(typeof metric.value);
     if (typeof metric.value !== 'string') continue;
     const progressId = JSON.parse(metric.value).progress;
     if (!subunitIds.includes(progressId)) subunitIds.push(progressId);
